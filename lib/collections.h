@@ -156,7 +156,12 @@ typename Container::iterator min(Container container) {
 // sorted_index
 // shuffle
 // to_array
+
 // size
+template<typename Container>
+int size(Container container) {
+  return container.size();
+}
 
 }  // namespace _
 
