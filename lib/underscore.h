@@ -8,6 +8,112 @@
 
 namespace underscore {
 
+namespace helper {
+
+// For a number of Underscore functions, the elements of a collection are
+// transformed in some way, and the results are placed in another collection.
+// To be able to support different kinds of collections, a way of choosing the
+// proper method for addition to the result collection must be called, but these
+// methods are not uniform across the standard library.
+
+// To get around this, the correct function to call must be determined at
+// compile time using metafunctions and SFINAE.
+
+// Because the body to determine whether or not a given member function is
+// relatively large, the HAS_MEMBER_FUNCTION macro is temporarily defined to
+// help reduce code size.
+// This is from http://stackoverflow.com/a/264088/1256
+#define HAS_MEMBER_FUNCTION(func, name)                             \
+  template<typename T, typename Sign>                               \
+  struct name {                                                     \
+    typedef char yes[1];                                            \
+    typedef char no [2];                                            \
+    template <typename U, U> struct type_check;                     \
+    template <typename _1> static yes &chk(type_check<Sign, &_1::func> *); \
+    template <typename   > static no  &chk(...);                    \
+    static bool const value = sizeof(chk<T>(0)) == sizeof(yes);     \
+  }
+
+// Use the macro to define metafunctions for the various insertion methods that
+// Underscore supports. Primarily, these will be single parameter member
+// functions that are used across multiple types in the standard library.
+HAS_MEMBER_FUNCTION(push_back, HasPushBack);
+HAS_MEMBER_FUNCTION(insert, HasInsert);
+
+// Remove the macro so that it doesn't pollute the global scope.
+#undef HAS_MEMBER_FUNCTION
+
+// To simplify function declarations later, the insertion capabilities for a
+// given type are simply listed in a struct.
+template<typename Container>
+struct MemberAdditionCapabilities {
+  static bool const has_push_back = HasPushBack<
+    Container,
+    void (Container::*)(const typename Container::value_type&)>::value;
+  static bool const has_insert = HasInsert<
+    Container,
+    std::pair<
+      typename Container::iterator,
+      bool> (Container::*)(const typename Container::value_type&)>::value;
+};
+
+template<typename Container>
+struct HasSupportedAdditionMethod {
+  static bool const value =
+      MemberAdditionCapabilities<Container>::has_push_back ||
+      MemberAdditionCapabilities<Container>::has_insert;
+};
+
+// A simple implementation of enable_if allows alternative functions to be
+// selected at compile time.
+// This is from http://stackoverflow.com/a/264088/1256
+template<bool C, typename T = void>
+struct enable_if {
+  typedef T type;
+};
+
+template<typename T>
+struct enable_if<false, T> {
+};
+
+template<typename Collection>
+typename enable_if<
+  MemberAdditionCapabilities<Collection>::has_insert,
+  void>::type insert(
+    Collection& collection,
+    typename Collection::value_type const & value) {
+  collection.insert(value);
+}
+
+template<typename Collection>
+typename enable_if<
+  MemberAdditionCapabilities<Collection>::has_push_back,
+  void>::type push_back(
+    Collection& collection,
+    typename Collection::value_type const & value) {
+  collection.push_back(value);
+}
+
+template<typename Collection>
+typename enable_if<
+  !MemberAdditionCapabilities<Collection>::has_push_back,
+  void>::type push_back(
+    Collection& collection,
+    typename Collection::value_type const & value) {
+    insert(collection, value);
+}
+
+template<typename Collection>
+typename enable_if<
+  HasSupportedAdditionMethod<Collection>::value,
+  void>::type add_to_collection(
+    Collection& collection,
+    typename Collection::value_type const & value) {
+  push_back(collection, value);
+}
+
+}  // namespace helper
+
 // Collections
 
 // each
