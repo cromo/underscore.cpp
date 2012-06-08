@@ -123,7 +123,6 @@ void each(Container container, Function function) {
 }
 
 // map
-// TODO(Cristian): make this not rely on back_inserter
 template<typename ResultContainer, typename Container, typename Function>
 ResultContainer map(Container container, Function function) {
   ResultContainer result;
@@ -167,7 +166,6 @@ typename Container::iterator find(Container container,
 }
 
 // filter
-// TODO(Cristian): make this not rely on push_back.
 template<typename Container, typename Predicate>
 Container filter(Container container, Predicate predicate) {
   Container result;
@@ -175,14 +173,13 @@ Container filter(Container container, Predicate predicate) {
       i != container.end();
       ++i) {
     if (predicate(*i)) {
-      result.push_back(*i);
+      helper::add_to_collection(result, *i);
     }
   }
   return result;
 }
 
 // reject
-// TODO(Cristian): make this not rely on push_back.
 template<typename Container, typename Predicate>
 Container reject(Container container, Predicate predicate) {
   Container result;
@@ -190,7 +187,7 @@ Container reject(Container container, Predicate predicate) {
       i != container.end();
       ++i) {
     if (!predicate(*i)) {
-      result.push_back(*i);
+      helper::add_to_collection(result, *i);
     }
   }
   return result;
