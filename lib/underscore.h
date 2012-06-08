@@ -127,10 +127,11 @@ void each(Container container, Function function) {
 template<typename ResultContainer, typename Container, typename Function>
 ResultContainer map(Container container, Function function) {
   ResultContainer result;
-  std::transform(container.begin(), 
-      container.end(), 
-      std::back_inserter(result), 
-      function);
+  for (typename Container::const_iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    helper::add_to_collection(result, function(*i));
+  }
   return result;
 }
 
