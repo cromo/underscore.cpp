@@ -166,9 +166,9 @@ typename Container::iterator find(Container container,
 }
 
 // filter
-template<typename Container, typename Predicate>
-Container filter(Container container, Predicate predicate) {
-  Container result;
+template<typename ResultContainer, typename Container, typename Predicate>
+ResultContainer filter(Container container, Predicate predicate) {
+  ResultContainer result;
   for (typename Container::const_iterator i = container.begin();
       i != container.end();
       ++i) {
@@ -180,9 +180,9 @@ Container filter(Container container, Predicate predicate) {
 }
 
 // reject
-template<typename Container, typename Predicate>
-Container reject(Container container, Predicate predicate) {
-  Container result;
+template<typename ResultContainer, typename Container, typename Predicate>
+ResultContainer reject(Container container, Predicate predicate) {
+  ResultContainer result;
   for (typename Container::const_iterator i = container.begin();
       i != container.end();
       ++i) {
