@@ -152,9 +152,18 @@ typename Container::iterator min(Container container) {
 }
 
 // sort_by
+template<typename Container, typename Function>
+Container sort_by(Container container, Function function) {
+  std::vector<typename Container::value_type> to_sort(container.begin(),
+      container.end());
+  std::sort(to_sort.begin(), to_sort.end(), function);
+  return Container(to_sort.begin(), to_sort.end());
+}
+
 // group_by
 // sorted_index
 // shuffle
+
 // to_array
 template<typename Container>
 typename Container::value_type* to_array(Container container) {
