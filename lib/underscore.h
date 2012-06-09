@@ -116,13 +116,18 @@ typename enable_if<
 
 // Collections
 
-// each
+// each/for_each
 template<typename Container, typename Function>
 void each(Container container, Function function) {
   std::for_each(container.begin(), container.end(), function);
 }
 
-// map
+template<typename Container, typename Function>
+void for_each(Container container, Function function) {
+  each(container, function);
+}
+
+// map/collect
 template<typename ResultContainer, typename Container, typename Function>
 ResultContainer map(Container container, Function function) {
   ResultContainer result;
@@ -134,7 +139,12 @@ ResultContainer map(Container container, Function function) {
   return result;
 }
 
-// reduce
+template<typename ResultContainer, typename Container, typename Function>
+ResultContainer collect(Container container, Function function) {
+  return map<ResultContainer>(container, function);
+}
+
+// reduce/inject/foldl
 template<typename Container, typename Function, typename Memo>
 Memo reduce(const Container container, Function function, Memo memo) {
   for (typename Container::const_iterator i = container.begin();
@@ -145,7 +155,17 @@ Memo reduce(const Container container, Function function, Memo memo) {
   return memo;
 }
 
-// reduce_right
+template<typename Container, typename Function, typename Memo>
+Memo inject(const Container container, Function function, Memo memo) {
+  return reduce(container, function, memo);
+}
+
+template<typename Container, typename Function, typename Memo>
+Memo foldl(const Container container, Function function, Memo memo) {
+  return reduce(container, function, memo);
+}
+
+// reduce_right/foldr
 template<typename Container, typename Function, typename Memo>
 Memo reduce_right(const Container container, 
     Function function, 
@@ -158,14 +178,27 @@ Memo reduce_right(const Container container,
   return memo;
 }
 
-// find
+template<typename Container, typename Function, typename Memo>
+Memo foldr(const Container container, 
+    Function function, 
+    Memo memo) {
+  return reduce_right(container, function, memo);
+}
+
+// find/detect
 template<typename Container, typename Predicate>
-typename Container::iterator find(Container container, 
+typename Container::iterator find(Container& container, 
     Predicate predicate) {
   return find_if(container.begin(), container.end(), predicate);
 }
 
-// filter
+template<typename Container, typename Predicate>
+typename Container::iterator detect(Container& container, 
+    Predicate predicate) {
+  return find(container, predicate);
+}
+
+// filter/select
 template<typename ResultContainer, typename Container, typename Predicate>
 ResultContainer filter(Container container, Predicate predicate) {
   ResultContainer result;
@@ -177,6 +210,11 @@ ResultContainer filter(Container container, Predicate predicate) {
     }
   }
   return result;
+}
+
+template<typename ResultContainer, typename Container, typename Predicate>
+ResultContainer select(Container container, Predicate predicate) {
+  return filter<ResultContainer>(container, predicate);
 }
 
 // reject
@@ -193,7 +231,7 @@ ResultContainer reject(Container container, Predicate predicate) {
   return result;
 }
 
-// all
+// all/every
 template<typename Container, typename Predicate>
 bool all(Container container, Predicate predicate) {
   for (typename Container::const_iterator i = container.begin();
@@ -206,7 +244,12 @@ bool all(Container container, Predicate predicate) {
   return true;
 }
 
-// any
+template<typename Container, typename Predicate>
+bool every(Container container, Predicate predicate) {
+  return all(container, predicate);
+}
+
+// any/some
 template<typename Container, typename Predicate>
 bool any(Container container, Predicate predicate) {
   for (typename Container::const_iterator i = container.begin();
@@ -219,11 +262,21 @@ bool any(Container container, Predicate predicate) {
   return false;
 }
 
-// include
+template<typename Container, typename Predicate>
+bool some(Container container, Predicate predicate) {
+  return any(container, predicate);
+}
+
+// include/contains
 template<typename Container>
 bool include(Container container, typename Container::value_type value) {
   return std::find(container.begin(), container.end(), value) !=
       container.end();
+}
+
+template<typename Container>
+bool contains(Container container, typename Container::value_type value) {
+  return include(container, value);
 }
 
 // invoke (Can be done with map and functors)
@@ -298,17 +351,17 @@ int size(Container container) {
 
 // Arrays
 
-// first
+// first/head
 // initial
 // last
-// rest
+// rest/tail
 // compact
 // flatten
 // without
 // union
 // intersection
 // difference
-// uniq
+// uniq/unique
 // zip
 // indexOf
 // lastIndexOf
