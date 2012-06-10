@@ -376,14 +376,27 @@ ResultContainer head(Collection& collection, int count) {
 // initial
 // last
 // rest/tail
+
 // compact
+template<typename ResultContainer, typename Collection>
+ResultContainer compact(Collection const & collection) {
+  ResultContainer result;
+  for (typename Collection::const_iterator i = collection.begin();
+      i != collection.end();
+      ++i) {
+    if (static_cast<bool>(*i)) {
+      helper::add_to_collection(result, *i);
+    }
+  }
+  return result;
+}
+
 // flatten
 // without
 // union
 // intersection
 // difference
 // uniq/unique
-// zip
 // indexOf
 // lastIndexOf
 // range
