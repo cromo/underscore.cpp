@@ -352,6 +352,27 @@ int size(Container container) {
 // Arrays
 
 // first/head
+template<typename Collection>
+typename Collection::iterator first(Collection& collection) {
+  return collection.begin();
+}
+
+// TODO(Cristian): Use std::advance instead of operator+ to move the interator.
+template<typename ResultContainer, typename Collection>
+ResultContainer first(Collection& collection, int count) {
+  return ResultContainer(collection.begin(), collection.begin() + count);
+}
+
+template<typename Collection>
+typename Collection::iterator head(Collection& collection) {
+  return first(collection);
+}
+
+template<typename ResultContainer, typename Collection>
+ResultContainer head(Collection& collection, int count) {
+  return first<ResultContainer>(collection, count);
+}
+
 // initial
 // last
 // rest/tail
