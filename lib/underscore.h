@@ -10,10 +10,10 @@ namespace underscore {
 
 namespace helper {
 
-// For a number of Underscore functions, the elements of a collection are
-// transformed in some way, and the results are placed in another collection.
-// To be able to support different kinds of collections, a way of choosing the
-// proper method for addition to the result collection must be called, but these
+// For a number of Underscore functions, the elements of a container are
+// transformed in some way, and the results are placed in another container.
+// To be able to support different kinds of containers, a way of choosing the
+// proper method for addition to the result container must be called, but these
 // methods are not uniform across the standard library.
 
 // To get around this, the correct function to call must be determined at
@@ -76,40 +76,40 @@ template<typename T>
 struct enable_if<false, T> {
 };
 
-template<typename Collection>
+template<typename Container>
 typename enable_if<
-  MemberAdditionCapabilities<Collection>::has_insert,
+  MemberAdditionCapabilities<Container>::has_insert,
   void>::type insert(
-    Collection& collection,
-    typename Collection::value_type const & value) {
-  collection.insert(value);
+    Container& container,
+    typename Container::value_type const & value) {
+  container.insert(value);
 }
 
-template<typename Collection>
+template<typename Container>
 typename enable_if<
-  MemberAdditionCapabilities<Collection>::has_push_back,
+  MemberAdditionCapabilities<Container>::has_push_back,
   void>::type push_back(
-    Collection& collection,
-    typename Collection::value_type const & value) {
-  collection.push_back(value);
+    Container& container,
+    typename Container::value_type const & value) {
+  container.push_back(value);
 }
 
-template<typename Collection>
+template<typename Container>
 typename enable_if<
-  !MemberAdditionCapabilities<Collection>::has_push_back,
+  !MemberAdditionCapabilities<Container>::has_push_back,
   void>::type push_back(
-    Collection& collection,
-    typename Collection::value_type const & value) {
-    insert(collection, value);
+    Container& container,
+    typename Container::value_type const & value) {
+    insert(container, value);
 }
 
-template<typename Collection>
+template<typename Container>
 typename enable_if<
-  HasSupportedAdditionMethod<Collection>::value,
-  void>::type add_to_collection(
-    Collection& collection,
-    typename Collection::value_type const & value) {
-  push_back(collection, value);
+  HasSupportedAdditionMethod<Container>::value,
+  void>::type add_to_container(
+    Container& container,
+    typename Container::value_type const & value) {
+  push_back(container, value);
 }
 
 }  // namespace helper
@@ -134,7 +134,7 @@ ResultContainer map(Container container, Function function) {
   for (typename Container::const_iterator i = container.begin();
       i != container.end();
       ++i) {
-    helper::add_to_collection(result, function(*i));
+    helper::add_to_container(result, function(*i));
   }
   return result;
 }
@@ -206,7 +206,7 @@ ResultContainer filter(Container container, Predicate predicate) {
       i != container.end();
       ++i) {
     if (predicate(*i)) {
-      helper::add_to_collection(result, *i);
+      helper::add_to_container(result, *i);
     }
   }
   return result;
@@ -225,7 +225,7 @@ ResultContainer reject(Container container, Predicate predicate) {
       i != container.end();
       ++i) {
     if (!predicate(*i)) {
-      helper::add_to_collection(result, *i);
+      helper::add_to_container(result, *i);
     }
   }
   return result;
@@ -352,25 +352,25 @@ int size(Container container) {
 // Arrays
 
 // first/head
-template<typename Collection>
-typename Collection::iterator first(Collection& collection) {
-  return collection.begin();
+template<typename Container>
+typename Container::iterator first(Container& container) {
+  return container.begin();
 }
 
 // TODO(Cristian): Use std::advance instead of operator+ to move the interator.
-template<typename ResultContainer, typename Collection>
-ResultContainer first(Collection& collection, int count) {
-  return ResultContainer(collection.begin(), collection.begin() + count);
+template<typename ResultContainer, typename Container>
+ResultContainer first(Container& container, int count) {
+  return ResultContainer(container.begin(), container.begin() + count);
 }
 
-template<typename Collection>
-typename Collection::iterator head(Collection& collection) {
-  return first(collection);
+template<typename Container>
+typename Container::iterator head(Container& container) {
+  return first(container);
 }
 
-template<typename ResultContainer, typename Collection>
-ResultContainer head(Collection& collection, int count) {
-  return first<ResultContainer>(collection, count);
+template<typename ResultContainer, typename Container>
+ResultContainer head(Container& container, int count) {
+  return first<ResultContainer>(container, count);
 }
 
 // initial
@@ -378,14 +378,14 @@ ResultContainer head(Collection& collection, int count) {
 // rest/tail
 
 // compact
-template<typename ResultContainer, typename Collection>
-ResultContainer compact(Collection const & collection) {
+template<typename ResultContainer, typename Container>
+ResultContainer compact(Container const & container) {
   ResultContainer result;
-  for (typename Collection::const_iterator i = collection.begin();
-      i != collection.end();
+  for (typename Container::const_iterator i = container.begin();
+      i != container.end();
       ++i) {
     if (static_cast<bool>(*i)) {
-      helper::add_to_collection(result, *i);
+      helper::add_to_container(result, *i);
     }
   }
   return result;
@@ -402,18 +402,18 @@ ResultContainer compact(Collection const & collection) {
 // range
 
 // zip
-template<typename Collection1, typename Collection2>
+template<typename Container1, typename Container2>
 std::vector<
-  std::pair<typename Collection1::value_type, 
-            typename Collection2::value_type> > zip(
-    const Collection1& collection1,
-    const Collection2& collection2) {
+  std::pair<typename Container1::value_type, 
+            typename Container2::value_type> > zip(
+    const Container1& container1,
+    const Container2& container2) {
   std::vector<
-    std::pair<typename Collection1::value_type,
-              typename Collection2::value_type> > result;
-  typename Collection1::const_iterator left = collection1.begin();
-  typename Collection2::const_iterator right = collection2.begin();
-  while (left != collection1.end() && right != collection2.end()) {
+    std::pair<typename Container1::value_type,
+              typename Container2::value_type> > result;
+  typename Container1::const_iterator left = container1.begin();
+  typename Container2::const_iterator right = container2.begin();
+  while (left != container1.end() && right != container2.end()) {
     result.push_back(std::make_pair(*left++, *right++));
   }
   return result;
