@@ -484,7 +484,9 @@ int index_of(Container& container, typename Container::value_type value, bool is
     return index_of(container, value);
   }
   typename Container::iterator value_lower_bound = std::lower_bound(
-      container.begin(), container.end(), value);
+      container.begin(),
+      container.end(),
+      value);
   return value_lower_bound == container.end() || *value_lower_bound != value ?
       -1 :
       std::distance(container.begin(), value_lower_bound);
