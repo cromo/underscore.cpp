@@ -357,10 +357,11 @@ typename Container::iterator first(Container& container) {
   return container.begin();
 }
 
-// TODO(Cristian): Use std::advance instead of operator+ to move the interator.
 template<typename ResultContainer, typename Container>
 ResultContainer first(Container& container, int count) {
-  return ResultContainer(container.begin(), container.begin() + count);
+  typename Container::iterator end = container.begin();
+  std::advance(end, count);
+  return ResultContainer(container.begin(), end);
 }
 
 template<typename Container>
