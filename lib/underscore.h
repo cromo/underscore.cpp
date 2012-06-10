@@ -405,6 +405,27 @@ ResultContainer last(Container& container, int n) {
 }
 
 // rest/tail
+template<typename ResultContainer, typename Container>
+ResultContainer rest(Container& container) {
+  return ResultContainer(++container.begin(), container.end());
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer rest(Container& container, int index) {
+  typename Container::iterator begin = container.begin();
+  std::advance(begin, index);
+  return ResultContainer(begin, container.end());
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer tail(Container& container) {
+  return rest<ResultContainer>(container);
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer tail(Container& container, int index) {
+  return rest<ResultContainer>(container, index);
+}
 
 // compact
 template<typename ResultContainer, typename Container>
@@ -426,9 +447,6 @@ ResultContainer compact(Container const & container) {
 // intersection
 // difference
 // uniq/unique
-// indexOf
-// lastIndexOf
-// range
 
 // zip
 template<typename Container1, typename Container2>
@@ -447,6 +465,33 @@ std::vector<
   }
   return result;
 }
+
+// index_of
+template<typename Container>
+int index_of(Container& container, typename Container::value_type value) {
+  typename Container::iterator value_position = std::find(
+      container.begin(),
+      container.end(),
+      value);
+  return value_position == container.end() ?
+      -1 :
+      std::distance(container.begin(), value_position);
+}
+
+template<typename Container>
+int index_of(Container& container, typename Container::value_type value, bool is_sorted) {
+  if (!is_sorted) {
+    return index_of(container, value);
+  }
+  typename Container::iterator value_lower_bound = std::lower_bound(
+      container.begin(), container.end(), value);
+  return value_lower_bound == container.end() || *value_lower_bound != value ?
+      -1 :
+      std::distance(container.begin(), value_lower_bound);
+}
+
+// lastIndexOf
+// range
 
 // Functions
 
