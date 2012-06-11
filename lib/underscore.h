@@ -290,7 +290,7 @@ typename Container::iterator max(Container container) {
   for (typename Container::iterator i = container.begin();
       i != container.end();
       ++i) {
-    if (*i > *max) {
+    if (*max < *i) {
       max = i;
     }
   }
