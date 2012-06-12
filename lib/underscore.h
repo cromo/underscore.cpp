@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <map>
 #include <vector>
 #include <utility>
 
@@ -322,6 +323,20 @@ Container sort_by(Container container, Function function) {
 }
 
 // group_by
+template<typename Key, typename Container, typename Function>
+std::multimap<Key, typename Container::value_type> group_by(
+    Container container,
+    Function function) {
+  std::multimap<Key, typename Container::value_type> result;
+  for (typename Container::iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    result.insert(
+        std::pair<Key, typename Container::value_type>(function(*i), *i));
+  }
+  return result;
+}
+
 // sorted_index
 // shuffle
 
