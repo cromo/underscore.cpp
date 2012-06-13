@@ -317,6 +317,17 @@ typename helper::enable_if<
 }
 
 // pluck
+// Called like `_::pluck<vector<int>>(container, &value_type::member)`
+template<typename ResultContainer, typename Container, typename Member>
+ResultContainer pluck(Container const& container, Member member) {
+  ResultContainer result;
+  for (typename Container::const_iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    helper::add_to_container(result, *i.*member);
+  }
+  return result;
+}
 
 // max
 template<typename Container>
