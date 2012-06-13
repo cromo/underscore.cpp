@@ -450,20 +450,19 @@ typename Container::iterator sorted_index(
 }
 
 namespace helper {
-  template<typename Argument, typename Function>
-  class TransformCompare : std::binary_function<Argument, Argument, bool> {
-   public:
-    TransformCompare(Function const& function) : function_(function) {
+template<typename Argument, typename Function>
+class TransformCompare : std::binary_function<Argument, Argument, bool> {
+ public:
+  TransformCompare(Function const& function) : function_(function) {
+  }
 
-    }
+  bool operator()(Argument const& left, Argument const& right) const {
+    return function_(left) < function_(right);
+  }
 
-    bool operator()(Argument const& left, Argument const& right) const {
-      return function_(left) < function_(right);
-    }
-
-   private:
-    Function function_;
-  };
+ private:
+  Function function_;
+};
 }  // namespace helper
 
 template<typename Container, typename Function>
@@ -612,20 +611,20 @@ ResultContainer compact(Container const & container) {
 
 // flatten
 namespace helper {
-  template<typename ResultContainer, typename Container>
-  ResultContainer flatten_one_layer(Container const& container) {
-    ResultContainer result;
-    for (typename Container::const_iterator i = container.begin();
-        i != container.end();
-        ++i) {
-      for(typename Container::value_type::const_iterator j = i->begin();
-          j != i->end();
-          ++j) {
-        add_to_container(result, *j);
-      }
+template<typename ResultContainer, typename Container>
+ResultContainer flatten_one_layer(Container const& container) {
+  ResultContainer result;
+  for (typename Container::const_iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    for(typename Container::value_type::const_iterator j = i->begin();
+        j != i->end();
+        ++j) {
+      add_to_container(result, *j);
     }
-    return result;
   }
+  return result;
+}
 }  // namespace helper
 
 // without
