@@ -430,6 +430,44 @@ std::multimap<Key, typename Container::value_type> group_by(
 }
 
 // sorted_index
+template<typename Container>
+typename Container::iterator sorted_index(
+    Container container,
+    typename Container::value_type const& value) {
+  return std::upper_bound(container.begin(), container.end(), value);
+}
+
+namespace helper {
+  template<typename Argument, typename Function>
+  class TransformCompare : std::binary_function<Argument, Argument, bool> {
+   public:
+    TransformCompare(Function const& function) : function_(function) {
+
+    }
+
+    bool operator()(Argument const& left, Argument const& right) const {
+      return function_(left) < function_(right);
+    }
+
+   private:
+    Function function_;
+  };
+}  // namespace helper
+
+template<typename Container, typename Function>
+typename Container::iterator sorted_index(
+  Container container,
+  typename Container::value_type const& value,
+  Function function) {
+  return std::upper_bound(
+      container.begin(),
+      container.end(),
+      value,
+      helper::TransformCompare<
+          typename Container::value_type,
+          Function>(function));
+}
+
 // shuffle
 
 // to_array
