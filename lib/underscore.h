@@ -600,6 +600,23 @@ ResultContainer compact(Container const & container) {
 }
 
 // flatten
+namespace helper {
+  template<typename ResultContainer, typename Container>
+  ResultContainer flatten_one_layer(Container const& container) {
+    ResultContainer result;
+    for (typename Container::const_iterator i = container.begin();
+        i != container.end();
+        ++i) {
+      for(typename Container::value_type::const_iterator j = i->begin();
+          j != i->end();
+          ++j) {
+        add_to_container(result, *j);
+      }
+    }
+    return result;
+  }
+}  // namespace helper
+
 // without
 // union
 // intersection
