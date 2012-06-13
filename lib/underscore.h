@@ -687,10 +687,106 @@ typename helper::enable_if<shallow == false, ResultContainer>::type flatten(
 }
 
 // without
+
+// uniq/unique
+template<typename ResultContainer,
+    typename Key,
+    typename Container,
+    typename Function>
+ResultContainer uniq(
+    Container const& container,
+    bool is_sorted,
+    Function function) {
+  ResultContainer result;
+  std::vector<Key> keys = map<std::vector<Key> >(container, function);
+  if (container.size() < 3) {
+    is_sorted = true;
+  }
+
+  std::vector<Key> memo;
+  for (std::pair<
+      typename std::vector<Key>::const_iterator,
+      typename Container::const_iterator> i = std::make_pair(
+      keys.begin(),
+      container.begin());
+      i.first != keys.end();
+      ++i.first, ++i.second) {
+    if (is_sorted ?
+        !memo.size() || *last(memo) != *i.first :
+        !include(memo, *i.first)) {
+      memo.push_back(*i.first);
+      helper::add_to_container(result, *i.second);
+    }
+  }
+  return result;
+}
+
+template<typename ResultContainer,
+    typename Key,
+    typename Container,
+    typename Function>
+ResultContainer uniq(Container const& container, Function function) {
+  return uniq<ResultContainer, Key>(container, false, function);
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer uniq(Container const& container, bool is_sorted) {
+  ResultContainer result;
+  if (container.size() < 3) {
+    is_sorted = true;
+  }
+
+  std::vector<typename Container::value_type> memo;
+  for (typename Container::const_iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    if (is_sorted ?
+        !memo.size() || *last(memo) != *i :
+        !include(memo, *i)) {
+      memo.push_back(*i);
+      helper::add_to_container(result, *i);
+    }
+  }
+  return result;
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer uniq(Container const& container) {
+  return uniq<ResultContainer>(container, false);
+}
+
+template<typename ResultContainer,
+    typename Key,
+    typename Container,
+    typename Function>
+ResultContainer unique(
+    Container const& container,
+    bool is_sorted,
+    Function function) {
+  return uniq<ResultContainer, Key>(container, is_sorted, function);
+}
+
+template<typename ResultContainer,
+    typename Key,
+    typename Container,
+    typename Function>
+ResultContainer unique(Container const& container, Function function) {
+  return uniq<ResultContainer, Key>(container, false, function);
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer unique(Container const& container, bool is_sorted) {
+  return uniq<ResultContainer>(container, is_sorted);
+}
+
+template<typename ResultContainer, typename Container>
+ResultContainer unique(Container const& container) {
+  return uniq<ResultContainer>(container, false);
+}
+
 // union
 // intersection
 // difference
-// uniq/unique
 
 // zip
 template<typename Container1, typename Container2>
