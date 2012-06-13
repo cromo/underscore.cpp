@@ -789,19 +789,17 @@ ResultContainer unique(Container const& container) {
 // difference
 
 // zip
-template<typename Container1, typename Container2>
-std::vector<
-  std::pair<typename Container1::value_type, 
-            typename Container2::value_type> > zip(
+template<typename ResultContainer, typename Container1, typename Container2>
+ResultContainer zip(
     const Container1& container1,
     const Container2& container2) {
-  std::vector<
-    std::pair<typename Container1::value_type,
-              typename Container2::value_type> > result;
+  ResultContainer result;
   typename Container1::const_iterator left = container1.begin();
   typename Container2::const_iterator right = container2.begin();
   while (left != container1.end() && right != container2.end()) {
-    result.push_back(std::make_pair(*left++, *right++));
+    helper::add_to_container(
+        result,
+        typename ResultContainer::value_type(*left++, *right++));
   }
   return result;
 }
