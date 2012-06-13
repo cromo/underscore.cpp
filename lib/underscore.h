@@ -318,11 +318,14 @@ typename helper::enable_if<
 // pluck
 
 // max
-// TODO(Cristian): make this accept a functor.
 template<typename Container>
 typename Container::iterator max(Container container) {
+  if (container.begin() == container.end()) {
+    return container.end();
+  }
+
   typename Container::iterator max = container.begin();
-  for (typename Container::iterator i = container.begin();
+  for (typename Container::iterator i = ++container.begin();
       i != container.end();
       ++i) {
     if (*max < *i) {
@@ -332,12 +335,41 @@ typename Container::iterator max(Container container) {
   return max;
 }
 
+template<typename Compared, typename Container, typename Function>
+typename Container::iterator max(Container container, Function function) {
+  if (container.begin() == container.end()) {
+    return container.end();
+  }
+
+  struct {
+    typename Container::iterator position;
+    Compared computed;
+  } max = {
+    container.begin(),
+    function(*container.begin())
+  };
+
+  for (typename Container::iterator i = ++container.begin();
+      i != container.end();
+      ++i) {
+    Compared computed = function(*i);
+    if (max.computed < computed) {
+      max.position = i;
+      max.computed = computed;
+    }
+  }
+  return max.position;
+}
+
 // min
-// TODO(Cristian): make this accept a functor.
 template<typename Container>
 typename Container::iterator min(Container container) {
+  if (container.begin() == container.end()) {
+    return container.end();
+  }
+
   typename Container::iterator min = container.begin();
-  for (typename Container::iterator i = container.begin();
+  for (typename Container::iterator i = ++container.begin();
       i != container.end();
       ++i) {
     if (*i < *min) {
@@ -345,6 +377,32 @@ typename Container::iterator min(Container container) {
     }
   }
   return min;
+}
+
+template<typename Compared, typename Container, typename Function>
+typename Container::iterator min(Container container, Function function) {
+  if (container.begin() == container.end()) {
+    return container.end();
+  }
+
+  struct {
+    typename Container::iterator position;
+    Compared computed;
+  } min = {
+    container.begin(),
+    function(*container.begin())
+  };
+
+  for (typename Container::iterator i = ++container.begin();
+      i != container.end();
+      ++i) {
+    Compared computed = function(*i);
+    if (computed < min.computed) {
+      min.position = i;
+      min.computed = computed;
+    }
+  }
+  return min.position;
 }
 
 // sort_by
