@@ -113,6 +113,16 @@ typename enable_if<
   push_back(container, value);
 }
 
+template<typename T>
+struct is_void {
+  static bool const value = false;
+};
+
+template<>
+struct is_void<void> {
+  static bool const value = true;
+};
+
 }  // namespace helper
 
 // Collections
@@ -280,8 +290,32 @@ bool contains(Container container, typename Container::value_type value) {
   return include(container, value);
 }
 
-// invoke (Can be done with map and functors)
-// pluck (same as above)
+// invoke
+template<typename ResultContainer, typename Container, typename Function>
+typename helper::enable_if<
+    !helper::is_void<ResultContainer>::value,
+    ResultContainer>::type invoke(Container container, Function function) {
+  ResultContainer result;
+  for (typename Container::iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    helper::add_to_container(result, (*i.*function)());
+  }
+  return result;
+}
+
+template<typename ResultContainer, typename Container, typename Function>
+typename helper::enable_if<
+    helper::is_void<ResultContainer>::value,
+    void>::type invoke(Container container, Function function) {
+  for (typename Container::iterator i = container.begin();
+      i != container.end();
+      ++i) {
+    (*i.*function)();
+  }
+}
+
+// pluck
 
 // max
 // TODO(Cristian): make this accept a functor.
