@@ -830,7 +830,27 @@ int index_of(Container& container, typename Container::value_type value, bool is
       std::distance(container.begin(), value_lower_bound);
 }
 
-// lastIndexOf
+// last_index_of
+template<typename Container>
+int last_index_of(
+    Container const& container,
+    typename Container::value_type value) {
+  typename Container::const_iterator result = std::find(
+      container.begin(),
+      container.end(),
+      value);
+  typename Container::const_iterator i = result;
+  while (i != container.end()) {
+    i = std::find(++i, container.end(), value);
+    if (i != container.end()) {
+      result = i;
+    }
+  }
+  return result == container.end() ?
+      -1 :
+      std::distance(container.begin(), result);
+}
+
 // range
 
 // Functions
