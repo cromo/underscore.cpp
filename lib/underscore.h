@@ -852,6 +852,30 @@ int last_index_of(
 }
 
 // range
+template<typename ResultContainer>
+ResultContainer range(int start, int stop, int step) {
+  int length = std::max((stop - start) / step, 0);
+  int index = 0;
+  ResultContainer result;
+
+  while (index < length) {
+    helper::add_to_container(result, start);
+    start += step;
+    ++index;
+  }
+
+  return result;
+}
+
+template<typename ResultContainer>
+ResultContainer range(int start, int stop) {
+  return range<ResultContainer>(start, stop, 1);
+}
+
+template<typename ResultContainer>
+ResultContainer range(int stop) {
+  return range<ResultContainer>(0, stop, 1);
+}
 
 // Functions
 
