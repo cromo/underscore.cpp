@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <map>
 #include <vector>
@@ -687,6 +688,14 @@ typename helper::enable_if<shallow == false, ResultContainer>::type flatten(
 }
 
 // without
+template<typename ResultContainer, typename Container>
+ResultContainer without(
+    Container const& container,
+    typename Container::value_type const& value) {
+  return filter<ResultContainer>(
+      container,
+      std::bind2nd(std::not_equal_to<typename Container::value_type>(), value));
+}
 
 // uniq/unique
 template<typename ResultContainer,
